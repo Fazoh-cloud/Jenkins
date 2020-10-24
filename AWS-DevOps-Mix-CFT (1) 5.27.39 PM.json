@@ -1,0 +1,122 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "This CloudFormation template provisions the AWS-Devops-Group/Mix Infrastructure",
+    "Metadata": {
+
+    },
+    "Parameters": {
+      "mixvpcparamcidr": {
+          "Description": "provide cidr block for my vpc",
+          "Type": "String",
+          "Default": ""
+      },
+      "mixpubparacidr": {
+          "Description": "provide a cidr block for public SN",
+          "Type": "String",
+          "Default": ""
+      },
+      "parapubAZ": {
+          "Description": "provide an AZ for the public SN",
+          "Type": "AWS::EC2::AvailabilityZone::Name",
+          "Default": ""
+      },
+      "parapriAZ": {
+          "Description": "provide an AZ for the private SN",
+          "Type": "AWS::EC2::AvailabilityZone::Name",
+          "Default": ""
+      },
+      "mixpriparacidr": {
+          "Description": "provide a cidr block for private SN",
+          "Type": "String",
+          "Default": ""
+      }
+
+    },
+    "Mappings": {
+
+    },
+    "Conditions": {
+
+    },
+    "Resources": {
+      "mixvpc": {
+        "Type": "AWS::EC2::VPC",
+        "Properties": {
+          "CidrBlock": { "Ref": "mixvpcparamcidr" },
+          "Tags": [{ "Key": "Name", "Value":  "mixvpc" }]
+        }
+      },
+      "mixIGW": {
+        "Type": "AWS::EC2::InternetGateway",
+        "Properties": {
+          "Tags": [{ "Key": "Name", "Value":  "mixIGw" }]
+        }
+      },
+      "AttachGateway": {
+        "Type": "AWS::EC2::VPCGatewayAttachment",
+        "Properties": {
+          "VpcId": { "Ref": "mixvpc" },
+          "InternetGatewayId": { "Ref": "mixIGW" }
+        }
+      },
+      "mixRTpri": {
+        "Type": "AWS::EC2::RouteTable",
+        "Properties": {
+          "VpcId": { "Ref": "mixvpc" },
+          "Tags": [{ "Key": "Name", "Value":  "mixRTpri" }]
+        }
+      },
+      "mixRTpub": {
+        "Type": "AWS::EC2::RouteTable",
+        "Properties": {
+          "VpcId": { "Ref": "mixvpc" },
+          "Tags": [{ "Key": "Name", "Value":  "mixRTpub" }]
+        }
+      },
+      "mixpubsn": {
+        "Type": "AWS::EC2::Subnet",
+        "Properties": {
+          "AvailabilityZone": { "Ref": "parapubAZ" },
+          "VpcId": { "Ref": "mixvpc" },
+          "CidrBlock": { "Ref": "mixpubparacidr" },
+          "Tags": [{ "Key": "Name", "Value":  "mixpubsn" }]
+        }
+      },
+      "mixprisn": {
+        "Type": "AWS::EC2::Subnet",
+        "Properties": {
+          "AvailabilityZone": { "Ref": "parapriAZ" },
+          "VpcId": { "Ref": "mixvpc" },
+          "CidrBlock": { "Ref": "mixpriparacidr" },
+          "Tags": [{ "Key": "Name", "Value":  "mixprisn" }]
+        }
+      },
+      "mixpubRTAS": {
+        "Type": "AWS::EC2::SubnetRouteTableAssociation",
+        "Properties": {
+          "SubnetId": { "Ref": "mixpubsn" },
+          "RouteTableId": { "Ref": "mixRTpub" }
+        }
+      },
+      "mixpriRTAS": {
+        "Type": "AWS::EC2::SubnetRouteTableAssociation",
+        "Properties": {
+          "SubnetId": { "Ref": "mixprisn" },
+          "RouteTableId": { "Ref": "mixRTpri" }
+        }
+      },
+      "mixPubRoute": {
+        "Type": "AWS::EC2::Route",
+        "Properties": {
+          "RouteTableId": { "Ref": "mixRTpub" },
+          "DestinationCidrBlock": "0.0.0.0/0",
+          "GatewayId": { "Ref": "mixIGW" }
+        }
+      }
+
+
+    },
+    "Outputs": {
+
+    }
+}
