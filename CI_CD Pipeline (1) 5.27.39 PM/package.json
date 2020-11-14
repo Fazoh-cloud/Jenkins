@@ -16,11 +16,15 @@
   "scripts": {
     "build": "rm -rf dist && parcel build src/index.html",
     "test": "jest",
-    "watch": "parcel src/index.html"
+    "watch": "parcel src/index.html",
+    "snyk-protect": "snyk protect",
+    "prepare": "yarn run snyk-protect"
   },
   "dependencies": {
     "react": ">= 16.3.0",
     "react-dom": ">= 16.3.0",
-    "styled-components": "~4.4.1"
-  }
+    "styled-components": "~4.4.1",
+    "snyk": "^1.426.0"
+  },
+  "snyk": true
 }
